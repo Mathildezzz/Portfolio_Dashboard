@@ -237,10 +237,11 @@ new_member_ty AS (
        ROW_NUMBER () OVER (PARTITION BY omni_channel_member_id ORDER BY order_paid_time ASC) AS rk
   FROM
      (
-        SELECT DISTINCT parent_order_id, order_paid_time, omni_channel_member_id
+   SELECT DISTINCT parent_order_id, MIN(order_paid_time) AS order_paid_time, omni_channel_member_id
          FROM omni_trans_fact
         WHERE if_eff_order_tag = TRUE
           AND is_member_order = TRUE
+     GROUP BY 1,3
      )
  ),
   

@@ -8,7 +8,7 @@ SELECT cnline1,
        cosine_similarity
 FROM spectrum.pa_II_ibcf_cnline_similarity
 WHEre RANK = 1
-  AND update_date = '2025-04-01' --- 取最新
+  AND update_date = (SELECT MAX(update_date) FROM spectrum.pa_II_ibcf_cnline_similarity) -- 取最新日期
 ),
 
 top_2 AS (
@@ -17,7 +17,7 @@ SELECT cnline1,
        cosine_similarity
 FROM spectrum.pa_II_ibcf_cnline_similarity
 WHEre RANK = 2
-  AND update_date = '2025-04-01' --- 取最新
+  AND update_date = (SELECT MAX(update_date) FROM spectrum.pa_II_ibcf_cnline_similarity) -- 取最新日期
 ),
 
 top_3 AS (
@@ -26,7 +26,7 @@ SELECT cnline1,
        cosine_similarity
 FROM spectrum.pa_II_ibcf_cnline_similarity
 WHEre RANK = 3
-  AND update_date = '2025-04-01' --- 取最新
+  AND update_date = (SELECT MAX(update_date) FROM spectrum.pa_II_ibcf_cnline_similarity) -- 取最新日期
 ),
 
 
@@ -36,7 +36,7 @@ SELECT cnline1,
        cosine_similarity
 FROM spectrum.pa_II_ibcf_cnline_similarity
 WHEre RANK = 4
-  AND update_date = '2025-04-01' --- 取最新
+  AND update_date = (SELECT MAX(update_date) FROM spectrum.pa_II_ibcf_cnline_similarity) -- 取最新日期
 ),
 
 
@@ -46,7 +46,7 @@ SELECT cnline1,
        cosine_similarity
 FROM spectrum.pa_II_ibcf_cnline_similarity
 WHEre RANK = 5
-  AND update_date = '2025-04-01' --- 取最新
+  AND update_date = (SELECT MAX(update_date) FROM spectrum.pa_II_ibcf_cnline_similarity) -- 取最新日期
 ),
 
 transaction_cte AS (

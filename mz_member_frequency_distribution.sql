@@ -1,4 +1,3 @@
-
 DELETE FROM tutorial.mz_member_frequency_distribution;
 INSERT INTO tutorial.mz_member_frequency_distribution
 
@@ -37,6 +36,8 @@ LEFT JOIN edw.d_dl_product_info_latest product
   cte AS (
     SELECT omni_channel_member_id,
           NULLIF((count(distinct case when is_member_order = TRUE AND if_eff_order_tag = true then trans.omni_channel_member_id else null end)),0)                                                                             AS member_shopper,
+          NULLIF((count(distinct case when is_member_order = TRUE AND if_eff_order_tag = true AND extract('year' FROM current_date) = extract('year' FROM order_paid_date) then trans.omni_channel_member_id else null end)),0)   AS member_shopper_YTD,
+
           CAST((sum(case when is_member_order IS TRUE AND sales_qty > 0 then order_rrp_amt else 0 end) - sum(case when is_member_order IS TRUE AND sales_qty < 0 then abs(order_rrp_amt) else 0 end)) AS FLOAT)                AS member_sales,
           CAST((sum(case when is_member_order IS TRUE AND sales_qty > 0 then order_rrp_amt else 0 end) - sum(case when is_member_order IS TRUE AND sales_qty < 0 then abs(order_rrp_amt) else 0 end)) AS FLOAT)/NULLIF(count(distinct case when is_member_order IS TRUE AND if_eff_order_tag = true then trans.parent_order_id else null end),0) AS member_atv,
           CAST((count(distinct case when is_member_order IS TRUE AND if_eff_order_tag = true then trans.parent_order_id else null end)) AS FLOAT) / NULLIF((count(distinct case when is_member_order IS TRUE AND if_eff_order_tag = true then trans.omni_channel_member_id else null end)) ,0)                                          AS member_frequency
@@ -47,11 +48,9 @@ LEFT JOIN edw.d_dl_product_info_latest product
 )
 
 SELECT CASE wHen member_frequency >= 5 THEN '5+' ELSE CAST(member_frequency AS text) end                                 AS member_frequency,
-       CAST(COUNT(DISTINCT omni_channel_member_id) AS FLOAT) /(SELECT COUNT(DISTiNCT omni_channel_member_id) FROM cte)   AS member_share 
+      COUNT(DISTINCT omni_channel_member_id)                                                                             AS member_shopper_LTD,
+       CAST(COUNT(DISTINCT omni_channel_member_id) AS FLOAT) /(SELECT COUNT(DISTiNCT omni_channel_member_id) FROM cte)   AS member_share,
+       SUM(member_shopper_YTD)                                                                                           AS member_shopper_YTD,
+       CAST(SUM(member_shopper_YTD) AS FLOAT)/COUNT(DISTINCT omni_channel_member_id)                                     AS share_purchased_YTD
      FROM CTE
      GROUP BY 1;
-     
-     
-
-     
- 

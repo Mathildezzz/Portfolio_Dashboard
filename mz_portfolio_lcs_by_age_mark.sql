@@ -1,6 +1,3 @@
--- DROP TABLE IF EXiSTS tutorial.mz_portfolio_lcs_by_age_mark;
--- CREATE TABLE tutorial.mz_portfolio_lcs_by_age_mark AS
-
 delete from tutorial.mz_portfolio_lcs_by_age_mark;  -- for the subsequent update
 insert into tutorial.mz_portfolio_lcs_by_age_mark
 
@@ -212,10 +209,11 @@ new_member_ty AS (
        ROW_NUMBER () OVER (PARTITION BY omni_channel_member_id ORDER BY order_paid_time ASC) AS rk
   FROM
      (
-        SELECT DISTINCT parent_order_id, order_paid_time, omni_channel_member_id
+        SELECT DISTINCT parent_order_id, MIN(order_paid_time) AS order_paid_time, omni_channel_member_id
          FROM omni_trans_fact
         WHERE if_eff_order_tag = TRUE
           AND is_member_order = TRUE
+     GROUP BY 1,3
      )
  ),
   
@@ -479,6 +477,3 @@ LEFT JOIN member_KPI_TY
       ON sales.age_mark_min_group = member_KPI_TY.age_mark_min_group
 LEFT JOIN member_KPI_LY
       ON sales.age_mark_min_group = member_KPI_LY.age_mark_min_group;
-
-       
-grant select on tutorial.mz_portfolio_lcs_by_age_mark to lego_bi_group;
